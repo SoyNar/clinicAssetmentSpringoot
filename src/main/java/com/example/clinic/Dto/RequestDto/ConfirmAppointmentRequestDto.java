@@ -11,6 +11,7 @@ import lombok.Setter;
 public class ConfirmAppointmentRequestDto {
     private Long appointmentId;
     private Long patientId;
+    private Long doctorId;
     private String medications;
     private String diagnostics;
     private String notes;

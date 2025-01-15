@@ -1,13 +1,14 @@
 package com.example.clinic.Exception;
 
-import com.example.clinic.Exception.ExceptionClass.EmailAlreadyExistException;
-import com.example.clinic.Exception.ExceptionClass.InvalidScheduleTimeException;
-import com.example.clinic.Exception.ExceptionClass.UserNotFoundException;
+import com.example.clinic.Exception.ExceptionClass.*;
+import org.springframework.data.repository.config.RepositoryConfigurationSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.InvalidMediaTypeException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+
+import java.security.PublicKey;
 
 @ControllerAdvice
 public class GlobalHandlerExceptions {
@@ -48,6 +49,17 @@ public class GlobalHandlerExceptions {
               return  new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<ErrorResponse> handlerUnauthorizedException(UnauthorizedException exception){
+        ErrorResponse error = ErrorResponse.builder()
+                .message(exception.getMessage())
+                .code(HttpStatus.UNAUTHORIZED.value())
+                .error("USUARIO NO AUTORIZADO")
+                .build();
+        return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+
+    }
+
     @ExceptionHandler(EmailAlreadyExistException.class)
     public ResponseEntity<ErrorResponse> handlerEmailAlreadyExistException(EmailAlreadyExistException exception){
         ErrorResponse error = ErrorResponse.builder()
@@ -57,5 +69,14 @@ public class GlobalHandlerExceptions {
                 .build();
               return new ResponseEntity<>(error, HttpStatus.CONFLICT);
 
+    }
+
+    public ResponseEntity<ErrorResponse> handlerBadRequestExceptions(BaRequestException exception){
+        ErrorResponse error = ErrorResponse.builder()
+                .message(exception.getMessage())
+                .code(HttpStatus.BAD_REQUEST.value())
+                .error("ERROR EN EL REQUEST")
+                .build();
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 }

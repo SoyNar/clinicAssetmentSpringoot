@@ -5,7 +5,11 @@ import com.example.clinic.Domain.MedicalSchedule;
 import com.example.clinic.Domain.Role;
 import com.example.clinic.Domain.User;
 import com.example.clinic.Dto.RequestDto.AppointmentRequestDto;
+import com.example.clinic.Dto.RequestDto.ConfirmAppointmentRequestDto;
 import com.example.clinic.Dto.ResponseDto.AppointmentResponseDto;
+import com.example.clinic.Dto.ResponseDto.ConfirmAppointmentResponseDto;
+import com.example.clinic.Exception.ExceptionClass.BaRequestException;
+import com.example.clinic.Exception.ExceptionClass.UnauthorizedException;
 import com.example.clinic.Exception.ExceptionClass.UserNotFoundException;
 import com.example.clinic.Repository.IAppointmentRepository;
 import com.example.clinic.Repository.IUserRepository;
@@ -161,14 +165,45 @@ public class AppointmentServiceImpl implements IAppointmentService {
 }
 //metodo para confirmar la atencion de una cita
     @Override
-    public AppointmentResponseDto confirmAttention(AppointmentRequestDto requestDto) {
+    public ConfirmAppointmentResponseDto confirmAttention(ConfirmAppointmentRequestDto requestDto) {
 
-        User patient = this.userRepository.findById(requestDto.getPatientId())
-                .orElseThrow(() -> new NoSuchElementException("paciente no existe");
+//        // Obtener el doctor autenticado
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        String currentUserEmail = authentication.getName(); /
 
-        this.appointmentRepository.findById(requestDto.)
+        MedicalAppointment appointemenFind = this.appointmentRepository.findById(requestDto.getAppointmentId()).orElseThrow(()
+                -> new RuntimeException("Cita no encontrada"));
 
-        return null;
+        //validar que la cita pertenece al medico
+        if (!appointemenFind.getDoctor().getId().equals(requestDto.getDoctorId())) {
+            throw new UnauthorizedException("No esta autorizado");
+        }
+
+        //validar qeu la cita no ha sido atendida anteiromente
+        if (appointemenFind.getStatusAppointment() == AppointmentStatus.ATTENDED) {
+            throw new BaRequestException("Esta cita ya ha sido atendida");
+        }
+
+        //crear entrada en la base de datos
+        //seria una actualziacion
+        appointemenFind.setDiagnostics(requestDto.getDiagnostics());
+        appointemenFind.setMedications(requestDto.getMedications());
+        appointemenFind.setNotes(requestDto.getNotes());
+        appointemenFind.setStatusAppointment(AppointmentStatus.ATTENDED);
+
+        MedicalAppointment updatedAppointment =  this.appointmentRepository.save(appointemenFind);
+
+        return ConfirmAppointmentResponseDto
+                .builder()
+                .patientId(updatedAppointment.getPatient().getId())
+                .notes(updatedAppointment.getNotes())
+                .medications(updatedAppointment.getMedications())
+                .doctorId(updatedAppointment.getDoctor().getId())
+                .reason(updatedAppointment.getReason())
+                .status(updatedAppointment.getStatusAppointment())
+                .diagnostics(updatedAppointment.getDiagnostics())
+                .id(updatedAppointment.getId())
+                .build();
     }
 
     private boolean isSlotAvailable(LocalDateTime slot, List<MedicalAppointment> existingAppointments, int duration) {
