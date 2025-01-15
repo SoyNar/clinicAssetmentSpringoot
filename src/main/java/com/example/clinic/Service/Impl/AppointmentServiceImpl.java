@@ -6,9 +6,12 @@ import com.example.clinic.Domain.Role;
 import com.example.clinic.Domain.User;
 import com.example.clinic.Dto.RequestDto.AppointmentRequestDto;
 import com.example.clinic.Dto.ResponseDto.AppointmentResponseDto;
+import com.example.clinic.Exception.ExceptionClass.UserNotFoundException;
 import com.example.clinic.Repository.IAppointmentRepository;
 import com.example.clinic.Repository.IUserRepository;
 import com.example.clinic.Service.IAppointmentService;
+import com.example.clinic.Utils.AppointmentStatus;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -16,9 +19,15 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
+
+@Slf4j
 @Service
 public class AppointmentServiceImpl implements IAppointmentService {
+
+
 
     private final IUserRepository userRepository;
     private final IAppointmentRepository appointmentRepository;
@@ -27,17 +36,19 @@ public class AppointmentServiceImpl implements IAppointmentService {
         this.userRepository = userRepository;
         this.appointmentRepository = appointmentRepository;
     }
+
     @Override
     public List<LocalDateTime> getAvailableSlot(Long doctorId, LocalDate date) {
 
         //buscar doctor por id
+        log.info("Buscando doctor");
         User doctor = userRepository.findById(doctorId)
                 .orElseThrow(() -> new RuntimeException("Doctor not found"));
-
-        if(!doctor.getRole().equals(Role.DOCTOR)){
-            throw  new IllegalArgumentException("Tiene que se un doctor");
+       log.info("doctor con id:{} no encontrado", doctor);
+        if (!doctor.getRole().equals(Role.DOCTOR)) {
+            throw new IllegalArgumentException("Tiene que se un doctor");
         }
- //verificar si el doctor tiene un horario asignado usando la entidad
+        //verificar si el doctor tiene un horario asignado usando la entidad
         MedicalSchedule schedule = doctor.getMedicalSchedules();
         if (schedule == null) {
             throw new RuntimeException("EL doctor no tiene un horario");
@@ -69,15 +80,15 @@ public class AppointmentServiceImpl implements IAppointmentService {
     public AppointmentResponseDto createAppointment(AppointmentRequestDto requestDto) {
 
         //buscar el paciente por su id usando el repositorio
-         User patient = this.userRepository.findById(requestDto.getPatientId())
-                 .orElseThrow(() ->new UsernameNotFoundException("paciente no existe"));
-          //buscar doctor por id
+        User patient = this.userRepository.findById(requestDto.getPatientId())
+                .orElseThrow(() -> new UsernameNotFoundException("paciente no existe"));
+        //buscar doctor por id
         User doctor = this.userRepository.findById(requestDto.getDoctorId())
                 .orElseThrow(() -> new UsernameNotFoundException(" el doctor no existe"));
 
-       if(!doctor.getRole().equals(Role.DOCTOR)){
-           throw  new IllegalArgumentException("Tiene que se un doctor");
-       }
+        if (!doctor.getRole().equals(Role.DOCTOR)) {
+            throw new IllegalArgumentException("Tiene que se un doctor");
+        }
 
         MedicalSchedule schedule = doctor.getMedicalSchedules();
         if (schedule == null) {
@@ -105,6 +116,7 @@ public class AppointmentServiceImpl implements IAppointmentService {
         appointment.setDoctor(doctor);
         appointment.setReason(requestDto.getReason());
         appointment.setDateTime(requestDto.getDate());
+        appointment.setStatusAppointment(AppointmentStatus.PENDING);
         this.appointmentRepository.save(appointment);
 
         return AppointmentResponseDto.builder()
@@ -112,8 +124,51 @@ public class AppointmentServiceImpl implements IAppointmentService {
                 .reason(appointment.getReason())
                 .doctorId(requestDto.getDoctorId())
                 .patientId(requestDto.getPatientId())
+                .status(String.valueOf(appointment.getStatusAppointment()))
                 .build();
 
+    }
+
+    @Override
+    public List<AppointmentResponseDto> getAppointmentByPatient(Long patientId) {
+
+    log.info("buscando paciente con id : {}",patientId);
+
+     User user =  this.userRepository.findById(patientId)
+                .orElseThrow(() -> new UserNotFoundException("paciente no encontrado"));
+
+        // Validación del rol
+        if (!user.getRole().equals(Role.PATIENT)) {
+            throw new IllegalArgumentException("El usuario no tiene rol de paciente");
+        }
+
+        List<MedicalAppointment> appointment = this.appointmentRepository.findByPatientId(patientId);
+        if (appointment.isEmpty()) {
+            throw new IllegalArgumentException("Paciente no tiene citas asignadas");
+        }
+
+
+        return appointment.stream()
+                .map(appDto ->
+                        AppointmentResponseDto.builder()
+                                .patientId(appDto.getPatient().getId())
+                                .status(String.valueOf(appDto.getStatusAppointment()))
+                                .dateTime(appDto.getDateTime())
+                                .doctorId(appDto.getDoctor().getId())
+                                .reason(appDto.getReason())
+                                .build())
+                .collect(Collectors.toList());
+}
+//metodo para confirmar la atencion de una cita
+    @Override
+    public AppointmentResponseDto confirmAttention(AppointmentRequestDto requestDto) {
+
+        User patient = this.userRepository.findById(requestDto.getPatientId())
+                .orElseThrow(() -> new NoSuchElementException("paciente no existe");
+
+        this.appointmentRepository.findById(requestDto.)
+
+        return null;
     }
 
     private boolean isSlotAvailable(LocalDateTime slot, List<MedicalAppointment> existingAppointments, int duration) {
@@ -123,4 +178,6 @@ public class AppointmentServiceImpl implements IAppointmentService {
                         (appointment.getDateTime().isEqual(slot) || appointment.getDateTime().isAfter(slot))
                                 && appointment.getDateTime().isBefore(slotEnd));
     }
+
+
 }

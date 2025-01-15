@@ -2,8 +2,10 @@ package com.example.clinic.Controller;
 
 import com.example.clinic.Dto.RequestDto.RegisterUserRequestDto;
 import com.example.clinic.Dto.RequestDto.ScheduleRequestDto;
+import com.example.clinic.Dto.ResponseDto.AppointmentResponseDto;
 import com.example.clinic.Dto.ResponseDto.RegisterUserResponseDto;
 import com.example.clinic.Dto.ResponseDto.ScheduleResponseDto;
+import com.example.clinic.Service.IAppointmentService;
 import com.example.clinic.Service.IScheduleService;
 import com.example.clinic.Service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,11 +21,13 @@ public class AdminController {
 
     private final IScheduleService scheduleService;
     private final IUserService userService;
+    private final IAppointmentService appointmentService;
 
     @Autowired
-    public AdminController(IScheduleService scheduleService, IUserService userService) {
+    public AdminController(IScheduleService scheduleService, IUserService userService, IAppointmentService appointmentService) {
         this.scheduleService = scheduleService;
         this.userService = userService;
+        this.appointmentService = appointmentService;
     }
 
     @PostMapping("/schedule")
@@ -45,5 +49,12 @@ public class AdminController {
     public ResponseEntity<List<RegisterUserResponseDto>> getAllUsers(){
         List<RegisterUserResponseDto> getUsers = this.userService.getALlUsers();
         return ResponseEntity.status(HttpStatus.OK).body(getUsers);
+    }
+
+    @GetMapping("/appointment/{patientId}")
+    public ResponseEntity<List<AppointmentResponseDto>> getAllAppointmentPatient(
+            @PathVariable Long patientId){
+        List<AppointmentResponseDto> appointments = this.appointmentService.getAppointmentByPatient(patientId);
+        return ResponseEntity.status(HttpStatus.OK).body(appointments);
     }
 }

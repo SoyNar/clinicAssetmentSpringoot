@@ -1,6 +1,7 @@
 package com.example.clinic.Domain;
 
 
+import com.example.clinic.Utils.AppointmentStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,6 +33,8 @@ public class MedicalAppointment {
     private String medications;
     private String diagnostics;
     private String notes;
+    @Enumerated(EnumType.STRING)
+    private AppointmentStatus statusAppointment;
 
     private  LocalDateTime dateTime;
 

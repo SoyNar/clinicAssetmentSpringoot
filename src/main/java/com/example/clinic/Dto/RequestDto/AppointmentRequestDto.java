@@ -16,4 +16,5 @@ public class AppointmentRequestDto {
     private Long patientId;
     private LocalDateTime date;
     private String reason;
+
 }
