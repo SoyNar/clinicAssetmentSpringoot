@@ -15,4 +15,5 @@ public interface IAppointmentService {
     AppointmentResponseDto createAppointment(AppointmentRequestDto requestDto);
     List<AppointmentResponseDto> getAppointmentByPatient(Long patientId);
     ConfirmAppointmentResponseDto confirmAttention(ConfirmAppointmentRequestDto requestDto);
+    List<ConfirmAppointmentResponseDto> getAppointmentByDoctorId(Long doctorID);
 }

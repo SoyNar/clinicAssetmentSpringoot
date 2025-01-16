@@ -206,6 +206,30 @@ public class AppointmentServiceImpl implements IAppointmentService {
                 .build();
     }
 
+    @Override
+    public List<ConfirmAppointmentResponseDto> getAppointmentByDoctorId(Long doctorId) {
+
+        if(doctorId == null){
+            throw  new BaRequestException("el id no puede estar vacio");
+        }
+       List<MedicalAppointment> appointment = this.appointmentRepository.findByDoctorId(doctorId);
+
+        return appointment.stream()
+                .map(app  -> ConfirmAppointmentResponseDto.builder()
+                        .notes(app.getNotes())
+                        .diagnostics(app.getDiagnostics())
+                        .status(app.getStatusAppointment())
+                        .id(app.getId())
+                        .reason(app.getReason())
+                        .medications(app.getMedications())
+                        .patientId(app.getPatient().getId())
+                        .doctorId(app.getDoctor().getId())
+                        .build()
+                )
+                .collect(Collectors.toList());
+
+    }
+
     private boolean isSlotAvailable(LocalDateTime slot, List<MedicalAppointment> existingAppointments, int duration) {
         LocalDateTime slotEnd = slot.plusMinutes(duration);
         return existingAppointments.stream()
@@ -213,6 +237,5 @@ public class AppointmentServiceImpl implements IAppointmentService {
                         (appointment.getDateTime().isEqual(slot) || appointment.getDateTime().isAfter(slot))
                                 && appointment.getDateTime().isBefore(slotEnd));
     }
-
 
 }

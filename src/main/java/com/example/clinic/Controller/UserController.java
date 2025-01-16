@@ -42,16 +42,21 @@ public class UserController {
         return ResponseEntity.ok(appointmentService.createAppointment(requestDto));
     }
 
-    @PutMapping("/confirm/{appointmentId}/appointments")
+    @PutMapping("/{appointmentId}/confirm")
     public ResponseEntity<ConfirmAppointmentResponseDto> confirmAttention(
             @PathVariable Long appointmentId,
             @RequestBody ConfirmAppointmentRequestDto requestDto) {
         if (!appointmentId.equals(requestDto.getAppointmentId())) {
-            throw new BaRequestException("url incorrecta");
+            throw new BaRequestException("El ID de la cita en la URL no coincide con el ID en el request");
         }
         ConfirmAppointmentResponseDto response = appointmentService.confirmAttention(requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @GetMapping("/appointment/{id}")
+    public ResponseEntity<List<ConfirmAppointmentResponseDto>> getAppointmentsByDoctor(@PathVariable Long id){
+        List<ConfirmAppointmentResponseDto> responseDto = this.appointmentService.getAppointmentByDoctorId(id);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
 
 }
