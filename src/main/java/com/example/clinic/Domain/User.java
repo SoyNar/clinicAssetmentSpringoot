@@ -24,6 +24,7 @@ public class User {
     private String email;
     @Column(nullable = false,unique = true)
     private String password;
+//    @Enumerated(EnumType.STRING)
     private Role role;
     private boolean isDoctor;
 

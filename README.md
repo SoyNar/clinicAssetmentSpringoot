@@ -136,3 +136,57 @@ Para evitar que dos pacientes agenden la misma cita en el mismo bloque de tiempo
 
 El sistema debe asegurarse de que dos pacientes no reserven el mismo bloque de tiempo simultáneamente mediante un manejo adecuado de la concurrencia, utilizando mecanismos como bloqueos a nivel de base de datos, transacciones atómicas, y validaciones de disponibilidad antes de confirmar la cita. Esto evitará errores y garantizará una experiencia confiable para los usuarios.
 
+### **Endpoints de la API**
+
+A continuación, se listan los endpoints para la gestión de citas médicas y usuarios:
+
+### 1. **Obtener todos los usuarios**
+- **Método:** `GET`
+- **Ruta:** `/api/users`
+- **Descripción:** Obtiene la lista de todos los usuarios registrados en el sistema.
+
+### 2. **Obtener disponibilidad médica**
+- **Método:** `GET`
+- **Ruta:** `/api/medico/{medicoId}/disponibilidad`
+- **Descripción:** Obtiene la disponibilidad de un médico basado en su horario de trabajo y la duración de la cita.
+
+### 3. **Agendar o crear una cita**
+- **Método:** `POST`
+- **Ruta:** `/api/citas`
+- **Descripción:** Permite a un paciente agendar una cita médica, verificando la disponibilidad del médico y el horario solicitado.
+
+### 4. **Registrar un usuario con cualquier rol**
+- **Método:** `POST`
+- **Ruta:** `/api/users/register`
+- **Descripción:** Permite registrar un usuario con cualquier rol (paciente, médico, administrador).
+
+### 5. **Registrar un usuario solo de tipo paciente**
+- **Método:** `POST`
+- **Ruta:** `/api/pacientes/register`
+- **Descripción:** Permite registrar un usuario únicamente con el rol de paciente.
+
+### 6. **Eliminar usuario**
+- **Método:** `DELETE`
+- **Ruta:** `/api/users/{userId}`
+- **Descripción:** Elimina un usuario específico del sistema.
+
+### 7. **Actualizar usuario**
+- **Método:** `PUT`
+- **Ruta:** `/api/users/{userId}`
+- **Descripción:** Actualiza la información de un usuario registrado.
+
+### 8. **Reprogramar cita**
+- **Método:** `PUT`
+- **Ruta:** `/api/citas/{citaId}/reprogramar`
+- **Descripción:** Permite reprogramar una cita previamente agendada.
+
+### 9. **Cancelar cita**
+- **Método:** `DELETE`
+- **Ruta:** `/api/citas/{citaId}`
+- **Descripción:** Permite cancelar una cita previamente agendada.
+
+### 10. **Editar horario médico**
+- **Método:** `PUT`
+- **Ruta:** `/api/medico/{medico}
+
+## **Manejo de spring security y JWt para la seguerira**

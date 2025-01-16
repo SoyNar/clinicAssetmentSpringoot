@@ -1,11 +1,9 @@
 package com.example.clinic.Domain;
 
 
+import com.example.clinic.Utils.AppointmentStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -15,6 +13,7 @@ import java.time.LocalTime;
 @Table(name="medical_appointments")
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class MedicalAppointment {
@@ -32,6 +31,8 @@ public class MedicalAppointment {
     private String medications;
     private String diagnostics;
     private String notes;
+    @Enumerated(EnumType.STRING)
+    private AppointmentStatus statusAppointment;
 
     private  LocalDateTime dateTime;
 

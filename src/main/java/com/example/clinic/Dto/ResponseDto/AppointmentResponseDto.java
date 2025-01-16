@@ -15,4 +15,5 @@ public class AppointmentResponseDto {
     private String reason;
     private Long doctorId;
     private Long patientId;
+    private String status;
 }
