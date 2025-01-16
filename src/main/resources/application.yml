@@ -25,6 +25,13 @@ security:
     name: admin
     password: 1234
 
+#Configuracion Springdoc
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+
+
 #Configuracion de Jwt
 jwt:
   secret: "tuClaveSecretaDebeSerMuyLargaYSegura32"

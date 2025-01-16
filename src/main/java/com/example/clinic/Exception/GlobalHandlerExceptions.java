@@ -65,7 +65,7 @@ public class GlobalHandlerExceptions {
         ErrorResponse error = ErrorResponse.builder()
                 .message(exception.getMessage())
                 .code(HttpStatus.CONFLICT.value())
-                .error("USUARIO YA EXISTE")
+                .error("CONFLICTO")
                 .build();
               return new ResponseEntity<>(error, HttpStatus.CONFLICT);
 

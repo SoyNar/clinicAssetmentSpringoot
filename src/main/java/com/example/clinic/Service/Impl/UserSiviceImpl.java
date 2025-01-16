@@ -9,6 +9,7 @@ import com.example.clinic.Service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,6 +27,8 @@ public class UserSiviceImpl implements IUserService {
         this.userRepository = userRepository;
         this.passwordEncoder =passwordEncoder;
     }
+
+    @Transactional
     @Override
     public RegisterUserResponseDto registerUser(RegisterUserRequestDto requestDto) {
         //validar si el email del usuario ya esta registrado en la base de datos

@@ -33,6 +33,8 @@ public class SecurityConfig {
                     auth.requestMatchers("/auth/**").permitAll();
                     auth.requestMatchers("/admin/**").permitAll();
                     auth.requestMatchers("/user/**").permitAll();
+                    auth.requestMatchers( "/swagger-ui/**", // Rutas de Swagger
+                            "/v3/api-docs/**").permitAll();
 //                    auth.requestMatchers("/auth/registerA").hasRole("ADMIN");
 //                    auth.requestMatchers("/api/public/**").permitAll();
                     auth.anyRequest().authenticated();
