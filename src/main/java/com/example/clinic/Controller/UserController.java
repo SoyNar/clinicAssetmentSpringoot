@@ -1,13 +1,14 @@
 package com.example.clinic.Controller;
 
-import com.example.clinic.Domain.MedicalSchedule;
+
 import com.example.clinic.Dto.RequestDto.AppointmentRequestDto;
 import com.example.clinic.Dto.RequestDto.ConfirmAppointmentRequestDto;
 import com.example.clinic.Dto.ResponseDto.AppointmentResponseDto;
 import com.example.clinic.Dto.ResponseDto.ConfirmAppointmentResponseDto;
 import com.example.clinic.Exception.ExceptionClass.BaRequestException;
 import com.example.clinic.Service.IAppointmentService;
-import org.apache.coyote.BadRequestException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/user")
+@Tag(
+        name = "User Controller",
+        description = "Controller for Patient and Doctor role"
+)
+@CrossOrigin(origins = "http://localhost:5173")
 public class UserController {
 
     private final IAppointmentService appointmentService;
@@ -30,6 +36,32 @@ public class UserController {
     }
 
     @GetMapping("/available-slots")
+    @Operation(
+            summary = "horarios disponibles",
+            description = "Obtener horarios disponibles",
+            tags = {"slots,available"}
+//            ,
+//            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+//                    description = "get available slots with doctor id and date appointments",
+//                    required = true,
+//                    content = @Content(
+//                            mediaType = "application/json",
+//                            schema = @Schema(implementation = LocalDateTime.class )
+//                    )
+//
+//            ),
+//            responses = {
+//                    @ApiResponse(
+//                            responseCode = "200",
+//                            description = "successful",
+//                            content = @Content(
+//                                    mediaType = "application/json",
+//                                    schema = @Schema(implementation = LocalDateTime.class)
+//                            )
+//                    )
+//            }
+
+    )
     public ResponseEntity<List<LocalDateTime>> getAvailableSlots(
             @RequestParam Long doctorId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
